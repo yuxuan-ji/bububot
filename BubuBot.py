@@ -15,9 +15,6 @@ extensions = (
 
 class BubuBot(commands.Bot):
 
-	import __main__
-	__main__.DEBUG = False
-
 	def __init__(self, *args, **kwargs):
 		'''Initializes a BubuBot object'''
 		# Bot parameters:
