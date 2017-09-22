@@ -4,6 +4,9 @@ from discord.ext import commands
 class Voice:
     '''Commands that require the use of a Voice Client'''
 
+    # NOTE: add https://github.com/bruchu/heroku-buildpack-ffmpeg.git to your
+    # buildpack on your heroku dashboard to allow it to use ffmpeg to download audio
+
     def __init__(self, client):
         self.client = client
         self.vc_client = None
