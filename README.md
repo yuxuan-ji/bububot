@@ -1,3 +1,5 @@
+#OUTDATED README
+
 Discord bot made by Chabbies
 
 
