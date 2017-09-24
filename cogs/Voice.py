@@ -1,6 +1,7 @@
 from discord.ext import commands
 # Heroku doesn't have libopus, so add https://github.com/heroku/heroku-buildpack-apt
 # to buildpacks with heroku buildpacks:add url, which will allow it to parse Aptfile
+# and add https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest for ffmpeg support
 
 # Borrowing from https://github.com/Just-Some-Bots/MusicBot/blob/master/musicbot/opus_loader.py to test
 from discord import opus
