@@ -1,33 +1,12 @@
 from discord.ext import commands
-# Heroku doesn't have libopus, so add https://github.com/heroku/heroku-buildpack-apt
-# to buildpacks with heroku buildpacks:add url, which will allow it to parse Aptfile
-# and add https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest for ffmpeg support
-
-# Borrowing from https://github.com/Just-Some-Bots/MusicBot/blob/master/musicbot/opus_loader.py to test
-from discord import opus
-
-OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll', 'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
-
-
-def load_opus_lib(opus_libs=OPUS_LIBS):
-    if opus.is_loaded():
-        return True
-
-    for opus_lib in opus_libs:
-        try:
-            opus.load_opus(opus_lib)
-            return
-        except OSError:
-            pass
-
-    raise RuntimeError('Could not load an opus lib. Tried %s' % (', '.join(opus_libs)))
+from .utils.opus_loader import load_opus_lib
+# Heroku doesn't have ffmpeg and libopus, so run the following in shell:
+# heroku buildpacks: add -i 2 https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest
+# heroku buildpacks:add -i 3 https://github.com/heroku/heroku-buildpack-apt
 
 
 class Voice:
     '''Commands that require the use of a Voice Client'''
-
-    # NOTE: use in shell: heroku buildpacks:add -i 2 https://github.com/bruchu/heroku-buildpack-ffmpeg.git
-    # To add ffmpeg to heroku
 
     def __init__(self, client):
         self.client = client
@@ -46,15 +25,8 @@ class Voice:
             return await self.client.say("Wait for current song to finish, my lazy ass didn't implement queues")
         if not args:
             return await self.client.say('G-Gimme something to play! B-Baka!!!1!!')
-        # Check if the input is an url or keywords:
-        if (len(args) == 1) and ('youtube.com' in args[0]):  # second condition of and won't be checked if first is false, no IndexError
-            url = args[0]
-        else:
-            keywords = args
-
-            def _getUrl(keywords):
-                # TODO: IMPLEMENT KEYWORD SEACHING
-                pass
+        
+        url = " ".join(args)
 
         try:
             # Join the voice channel if its not connected:
@@ -64,9 +36,11 @@ class Voice:
                 except Exception as err:
                     print(err)
                     return
-            # Play the song:
+            # Play the song, with auto searching for keywords enabled:
             try:
-                self.player = await self.vc_client.create_ytdl_player(url)
+                opts = {'default_search': 'auto',
+                        'quiet': True}
+                self.player = await self.vc_client.create_ytdl_player(url, ytdl_options=opts)
                 self.player.start()
             except Exception as err:
                 print(err)
@@ -77,9 +51,12 @@ class Voice:
     async def stop(self):
         '''Stop song, clear queue, disconnect Bot'''
         try:
-            if (self.player is not None) and self.player.is_playing():
+            if (self.player is not None) and (self.player.is_playing()):
                 self.player.stop()
-            await self.vc_client.disconnect()
+            if self.vc_client is not None:
+                await self.vc_client.disconnect()
+            else:
+                await self.client.say("Not connected")
         except Exception as err:
             print(err)
         finally:
@@ -91,6 +68,8 @@ class Voice:
         try:
             if (self.player is not None) and self.player.is_playing():
                 self.player.stop()
+            else:
+                await self.client.say("No song playing")
         except Exception as err:
             print(err)
 

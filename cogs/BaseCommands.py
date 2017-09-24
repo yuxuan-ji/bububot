@@ -14,7 +14,7 @@ class BaseCommands:
     #       using ctx.message gives the original Message object,
     #       using client.say() == client.send_message(ctx.message.channel,content='',*)
     
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, hidden=True)
     @commands.check(is_bot_owner)
     async def die(self, ctx):
         ''' Disconnects the bot *Bot Owner'''
