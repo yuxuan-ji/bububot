@@ -1,5 +1,6 @@
 from discord.ext import commands
 from .utils.opus_loader import load_opus_lib
+from datetime import timedelta
 # Heroku doesn't have ffmpeg and libopus, so run the following in shell:
 # heroku buildpacks: add -i 2 https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest
 # heroku buildpacks:add -i 3 https://github.com/heroku/heroku-buildpack-apt
@@ -41,6 +42,11 @@ class Voice:
                 opts = {'default_search': 'auto',
                         'quiet': True}
                 self.player = await self.vc_client.create_ytdl_player(url, ytdl_options=opts)
+                title = self.player.title
+                uploader = self.player.uploader
+                duration = str(timedelta(seconds=int(self.player.duration)))
+                views = self.player.views
+                await self.client.say("Playing [{}] by [{}] : [{}] [{} views]".format(title, uploader, duration, views))
                 self.player.start()
             except Exception as err:
                 print(err)
