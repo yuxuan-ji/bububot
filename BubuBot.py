@@ -10,6 +10,7 @@ extensions = (
     'cogs.Shadowverse',
     'cogs.Waifus',
     'cogs.Move',
+    'cogs.Voice',
     'cogs.Games')
 
 
