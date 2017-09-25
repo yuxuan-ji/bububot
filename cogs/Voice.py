@@ -74,7 +74,7 @@ class Voice:
             duration = str(timedelta(seconds=int(self.player.duration)))
             views = self.player.views
             # **word** is bold in discord:
-            await self.client.say("Playing **{}** by **{}**:  [{}]  [{} views]".format(title, uploader, duration, views))
+            await self.client.say("Playing **{}** by **{}** :  [{}]  [{} views]".format(title, uploader, duration, views))
         
         except Exception as err:
             await self.client.say('Could not create a player')
@@ -96,6 +96,7 @@ class Voice:
         '''Skip song'''
         if (self.player is not None) and self.player.is_playing():
             self.player.stop()
+            self.player = None
         else:
             await self.client.say("No song playing")
 
