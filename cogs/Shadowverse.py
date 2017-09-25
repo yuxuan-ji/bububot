@@ -90,6 +90,7 @@ class Shadowverse:
         except Exception as err:
             await self.client.say(str(err))
             await postAcceptedInputs(client=self.client, choices=self.choices.keys())
+            print(err)
 
 
 def setup(client):

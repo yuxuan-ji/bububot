@@ -22,7 +22,7 @@ class Clear:
                 earlierDateTime = datetime.now() - timedelta(days=14)
                 await self.client.purge_from(ctx.message.channel, after=earlierDateTime)
             except Exception as err:
-                await self.client.say('Unable to purge: {}'.format(err))
+                await self.client.say('Unable to purge')
                 print(err)
 
 

@@ -17,7 +17,7 @@ class BaseCommands:
     @commands.command(pass_context=True, hidden=True)
     @commands.check(is_bot_owner)
     async def die(self, ctx):
-        ''' Disconnects the bot *Bot Owner'''
+        ''' Force disconnect the bot'''
         await self.client.say("Bubu ga shinda")
         await self.client.close()
 
@@ -28,18 +28,14 @@ class BaseCommands:
             return await self.client.say('working!')
         except Exception as err:
             print(err)
-            self.client.say('Not working: {}'.format(err))
+            self.client.say('Not working')
 
     @commands.command(pass_context=True)
     @commands.check(is_admin)
     async def changeplaying(self, ctx, *args):
         '''<gamename> *Admin'''
-        try:
-            statusName = " ".join(args)
-            await self.client.change_presence(game=discord.Game(name=statusName))
-        except Exception as err:
-            print(err)
-            await self.client.say("Coudn't change presence: {]".format(err))
+        statusName = " ".join(args)
+        await self.client.change_presence(game=discord.Game(name=statusName))
 
     @commands.command(pass_context=True)
     async def uptime(self, ctx):

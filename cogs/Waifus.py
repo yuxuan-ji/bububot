@@ -34,8 +34,8 @@ class Waifus:
                                    {'name': name, 'emote': emote, 'url': url})
                     await self.client.say('Added {} {}'.format(name, emote))
         except Exception as err:
+            await self.client.say("Could not add to the database")
             print(err)
-            await self.client.say(str(err))
 
     @commands.command(pass_context=True)
     @commands.check(is_admin)
@@ -49,8 +49,8 @@ class Waifus:
                                {'name': name, 'emote': emote})
                 await self.client.say('Deleted {} {}'.format(name, emote))
         except Exception as err:
+            await self.client.say("Could not delete from the database")
             print(err)
-            await self.client.say(str(err))
 
     @commands.command(pass_context=True)
     async def waifu(self, ctx, *args):
@@ -60,11 +60,11 @@ class Waifus:
             with self.conn:
                 try:
                     self.c.execute('SELECT * FROM waifus')
-                    entries = self.c.fetchall()  # returns a list of tuples (field1, field2, ...)
+                    entries = self.c.fetchall()  # returns a list of tuples (field1, field2, ...) or None
                     # Remove the urls
                     entries_no_url = sorted([' '.join([rows[0], rows[1]]) for rows in entries])
                     await postAcceptedInputs(client=self.client, choices=entries_no_url)
-                except:
+                except TypeError:
                     await self.client.say('No waifus added yet')
         else:
             name = args[0]
@@ -74,12 +74,11 @@ class Waifus:
                     # Grab the url and post it using an embed:
                     self.c.execute('SELECT * FROM waifus WHERE name = %(name)s AND emote = %(emote)s',
                                    {'name': name, 'emote': emote})
-                    entry = self.c.fetchone()  # returns a tuple (field1, field2, ...)
+                    entry = self.c.fetchone()  # returns a tuple (field1, field2, ...) or None
                     entry_url = entry[2]
                     await postEmbedImg(client=self.client, url=entry_url)
-                except Exception as err:
-                    print(err)
-                    await self.client.say(str(err))
+                except TypeError as err:
+                    await self.client.say("Not an entry in the database")
 
 
 def setup(client):
