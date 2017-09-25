@@ -59,6 +59,7 @@ class Voice:
                 self.vc_client = await self.client.join_voice_channel(ctx.message.author.voice_channel)
             except Exception as err:
                 await self.client.say('Could not join the voice channel')
+                self._cleanup()
                 print(err)
         
         # Play the song, with auto searching for keywords enabled:
@@ -78,6 +79,7 @@ class Voice:
         
         except Exception as err:
             await self.client.say('Could not create a player')
+            self._cleanup()
             print(err)
 
     @commands.command()
