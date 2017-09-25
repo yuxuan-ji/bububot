@@ -73,7 +73,8 @@ class Voice:
             uploader = self.player.uploader
             duration = str(timedelta(seconds=int(self.player.duration)))
             views = self.player.views
-            await self.client.say("Playing [{}] by [{}] : [{}] [{} views]".format(title, uploader, duration, views))
+            # **word** is bold in discord:
+            await self.client.say("Playing **{}** by **{}**:  [{}]  [{} views]".format(title, uploader, duration, views))
         
         except Exception as err:
             await self.client.say('Could not create a player')
