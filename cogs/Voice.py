@@ -15,6 +15,7 @@ class Voice:
         self.client = client
         self.vc_client = None
         self.player = None
+        self.player_volume = 0.10
 
     def _cleanup(self):
         '''Resets the attributes to default'''
@@ -65,6 +66,7 @@ class Voice:
             opts = {'default_search': 'auto',
                     'quiet': True}
             self.player = await self.vc_client.create_ytdl_player(url, ytdl_options=opts)
+            self.player.volume = self.player_volume
             self.player.start()
             
             title = self.player.title
