@@ -56,4 +56,4 @@ class BubuBot(commands.Bot):
                 await self.send_message(channel, content="Insufficient permissions")
             else:
                 print(err)
-                await self.send_message("Something bad happened")
+                await self.send_message(channel, content="Something bad happened")

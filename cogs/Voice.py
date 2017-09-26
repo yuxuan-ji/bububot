@@ -22,26 +22,27 @@ class Voice:
         self.vc_client = None
         self.player = None
 
-    async def disconnect_timer(self):
-        '''Disconnect after a minute of inactivity'''
-        stop_time = None
-        while self == self.client.get_cog('Voice'):
-            if (self.vc_client is not None) and (self.player is not None):
-                # Whenever a song is playing, overwrite stop_time:
-                if self.player.is_playing():
-                    stop_time = None
-
-                # When a song has stopped playing, register stop_time and disconnect after a minute:
-                if self.player.is_done():
-                    if stop_time:
-                        if int((time.time() - stop_time)) > 60:
-                            await self.vc_client.disconnect()
-                            self._cleanup()
-                            stop_time = None
-                        continue  # skip the below if stop_time is registered, we don't want to overwrite it
-                    stop_time = time.time()
-                
-            await asyncio.sleep(5)
+    # Crashes the bot on TimeOut error (?), disabled until fix
+    #async def disconnect_timer(self):
+    #    '''Disconnect after a minute of inactivity'''
+    #    stop_time = None
+    #    while self == self.client.get_cog('Voice'):
+    #        if (self.vc_client is not None) and (self.player is not None):
+    #            # Whenever a song is playing, overwrite stop_time:
+    #            if self.player.is_playing():
+    #                stop_time = None
+#
+    #            # When a song has stopped playing, register stop_time and disconnect after a minute:
+    #            if self.player.is_done():
+    #                if stop_time:
+    #                    if int((time.time() - stop_time)) > 60:
+    #                        await self.vc_client.disconnect()
+    #                        self._cleanup()
+    #                        stop_time = None
+    #                    continue  # skip the below if stop_time is registered, we don't want to overwrite it
+    #                stop_time = time.time()
+    #            
+    #        await asyncio.sleep(5)
 
     @commands.command(pass_context=True)
     async def play(self, ctx, *args):
@@ -107,4 +108,4 @@ def setup(client):
     load_opus_lib()
     n = Voice(client)
     client.add_cog(n)
-    client.loop.create_task(n.disconnect_timer())
+    #client.loop.create_task(n.disconnect_timer())
