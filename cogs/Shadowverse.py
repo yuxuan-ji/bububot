@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 from .PackSims.PackSimulator import PackSimulator
 from .utils.Posts import postAcceptedInputs
-from __main__ import DEBUG
 
 
 class Shadowverse:
@@ -52,15 +51,11 @@ class Shadowverse:
                 if SHOW:
                     embed = discord.Embed()
                     embed.set_image(url=card.img)
-                    if DEBUG:
-                        embed.add_field(name='DEBUG', value=card.img)
                     imgEmbeds.append(embed)
 
             # The first message is an Embed containing the card names and url
             embed = discord.Embed()
             embed.add_field(name="The Cards you've opened are:", value=value)
-            if DEBUG:
-                embed.add_field(name='DEBUG', value=[card.probabilities for card in myPack])
             firstMsg = await self.client.say(embed=embed)  # self.client.say returns a Message object
 
             # Then, possibly post the images to the channel and delete after x seconds
@@ -76,21 +71,14 @@ class Shadowverse:
                 # Note: Tried using client.say()'s delete_after:float parameter but it wasn't as smooth as doing it manually
                 imgMgs.append(await self.client.say('Deleting in {} seconds'.format(time)))
                 await asyncio.sleep(time)
-                try:
-                    await self.client.delete_messages(imgMgs)
-                except Exception as err:
-                    await self.client.say('Unable to delete: {}'.format(err))
-                    print(err)
+                await self.client.delete_messages(imgMgs)
 
+            self.client.logger.debug("Opened: " + str([(card.name, card.probabilities, card.img) for card in myPack]))
             return firstMsg
         
         except KeyError:
             await self.client.say('Unidentified pack')
             await postAcceptedInputs(client=self.client, choices=self.choices.keys())
-        except Exception as err:
-            await self.client.say(str(err))
-            await postAcceptedInputs(client=self.client, choices=self.choices.keys())
-            print(err)
 
 
 def setup(client):

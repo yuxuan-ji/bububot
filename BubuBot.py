@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
-
+import logging
 
 # Extensions to load into BubuBot:
 extensions = (
@@ -16,19 +16,22 @@ extensions = (
 
 class BubuBot(commands.Bot):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs,):
         '''Initializes a BubuBot object'''
         # Bot parameters:
-        super().__init__(*args, **kwargs)
         self.login_time = None  # To be updated on ready
         self.owner_id = None
+        self.DEBUG_MODE = kwargs.pop('DEBUG_MODE', False)
+        self.logger = self.set_logger(self.DEBUG_MODE)
 
+        super().__init__(*args, **kwargs)
+        
         # Loading the cogs:
         for extension in extensions:
             try:
                 self.load_extension(extension)
             except Exception as err:
-                print('Failed to load {}'.format(extension), err)
+                self.logger.exception('Failed to load {}'.format(extension))
 
         # Base events:
         @self.event
@@ -54,6 +57,34 @@ class BubuBot(commands.Bot):
             channel = ctx.message.channel
             if isinstance(err, commands.CheckFailure):
                 await self.send_message(channel, content="Insufficient permissions")
+            elif isinstance(err, commands.CommandNotFound):
+                await self.send_message(channel, content="Not a command")
+            elif isinstance(err, commands.BadArgument):
+                await self.send_message(channel, content="Invalid arguments")
             else:
-                print(err)
+                self.logger.error("Unexpected error" + str(err))
                 await self.send_message(channel, content="Something bad happened")
+
+    @staticmethod
+    def set_logger(DEBUG_MODE=False):
+        """Create a logger on debug mode or info mode"""
+        if DEBUG_MODE:
+            level = logging.DEBUG
+        else:
+            level = logging.INFO
+        logger = logging.getLogger(__name__)
+        logger.setLevel(level)
+
+        bot_format = logging.Formatter(
+            '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
+            '%(message)s',
+            datefmt="[%d/%m/%Y %H:%M]")
+
+        # Create a handler that prints to stdout:
+        stdout_handler = logging.StreamHandler()
+        stdout_handler.setFormatter(bot_format)
+        stdout_handler.setLevel(level)
+
+        logger.addHandler(stdout_handler)
+
+        return logger

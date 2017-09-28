@@ -1,7 +1,6 @@
 from discord.ext import commands
 from .utils.Posts import postAcceptedInputs, postEmbedImg
 from .utils.Checks import is_admin
-from .utils.HerokuPostgresConn import conn, c
 
 
 class Waifus:
@@ -12,8 +11,14 @@ class Waifus:
         self.client = client
         # SQL table config:
         # NOTE: execute DROP TABLE locally to change columns config, will lose all data though.
-        self.conn = conn
-        self.c = c
+        if self.client.DEBUG_MODE:
+            from .utils.HerokuPostgresConn import get_manual_conn
+            self.conn, self.c = get_manual_conn()
+            self.client.logger.debug("Using manual connection")
+        else:
+            from .utils.HerokuPostgresConn import get_conn
+            self.conn, self.c = get_conn()
+            self.client.logger.debug("Using auto connection")
         self.c.execute("CREATE TABLE IF NOT EXISTS waifus (name TEXT, emote TEXT, url TEXT)")
 
     @commands.command(pass_context=True)
@@ -33,9 +38,10 @@ class Waifus:
                     self.c.execute("INSERT INTO waifus VALUES (%(name)s, %(emote)s, %(url)s)",
                                    {'name': name, 'emote': emote, 'url': url})
                     await self.client.say('Added {} {}'.format(name, emote))
+                    self.client.logger.info("Entry {} {} was added to the database".format(name, emote))
         except Exception as err:
             await self.client.say("Could not add to the database")
-            print(err)
+            self.client.logger.exception("Could not add to the database")
 
     @commands.command(pass_context=True)
     @commands.check(is_admin)
@@ -48,9 +54,10 @@ class Waifus:
                 self.c.execute('DELETE FROM waifus WHERE name = %(name)s AND emote = %(emote)s',
                                {'name': name, 'emote': emote})
                 await self.client.say('Deleted {} {}'.format(name, emote))
+                self.client.logger.info('Deleted {} {} from the database'.format(name, emote))
         except Exception as err:
             await self.client.say("Could not delete from the database")
-            print(err)
+            self.client.logger.exception("Could delete from the database")
 
     @commands.command(pass_context=True)
     async def waifu(self, ctx, *args):
@@ -61,10 +68,11 @@ class Waifus:
                 try:
                     self.c.execute('SELECT * FROM waifus')
                     entries = self.c.fetchall()  # returns a list of tuples (field1, field2, ...) or None
+                    assert(isinstance(entries, list))
                     # Remove the urls
                     entries_no_url = sorted([' '.join([rows[0], rows[1]]) for rows in entries])
                     await postAcceptedInputs(client=self.client, choices=entries_no_url)
-                except TypeError:
+                except AssertionError:
                     await self.client.say('No waifus added yet')
         else:
             name = args[0]
@@ -75,9 +83,10 @@ class Waifus:
                     self.c.execute('SELECT * FROM waifus WHERE name = %(name)s AND emote = %(emote)s',
                                    {'name': name, 'emote': emote})
                     entry = self.c.fetchone()  # returns a tuple (field1, field2, ...) or None
+                    assert(isinstance(entry, tuple))
                     entry_url = entry[2]
                     await postEmbedImg(client=self.client, url=entry_url)
-                except TypeError as err:
+                except AssertionError:
                     await self.client.say("Not an entry in the database")
 
 

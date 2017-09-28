@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from .utils.Checks import is_admin, is_bot_owner
 from datetime import datetime
+import asyncio
         
 
 class BaseCommands:
@@ -20,14 +21,16 @@ class BaseCommands:
         ''' Force disconnect the bot'''
         await self.client.say("Bubu ga shinda")
         await self.client.close()
+        self.client.logger.info("Bot closed using !b die")
 
     @commands.command(pass_context=True)
     async def test(self, ctx):
         '''Test command'''
         try:
+            self.client.logger.info("!b test working")
             return await self.client.say('working!')
         except Exception as err:
-            print(err)
+            self.client.logger.exception("!b test not working")
             self.client.say('Not working')
 
     @commands.command(pass_context=True)
@@ -36,7 +39,8 @@ class BaseCommands:
         '''<gamename> *Admin'''
         statusName = " ".join(args)
         await self.client.change_presence(game=discord.Game(name=statusName))
-
+        self.client.logger.info("Presence changed to {}".format(statusName))
+        
     @commands.command(pass_context=True)
     async def uptime(self, ctx):
         '''Prints out how long the bot has been online'''

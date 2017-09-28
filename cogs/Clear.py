@@ -18,12 +18,8 @@ class Clear:
             await self.client.purge_from(ctx.message.channel, limit=int(number))
         except:
             # If the maximum 14 days limit is reached, purge all until the limit
-            try:
-                earlierDateTime = datetime.now() - timedelta(days=14)
-                await self.client.purge_from(ctx.message.channel, after=earlierDateTime)
-            except Exception as err:
-                await self.client.say('Unable to purge')
-                print(err)
+            earlierDateTime = datetime.now() - timedelta(days=14)
+            await self.client.purge_from(ctx.message.channel, after=earlierDateTime)
 
 
 def setup(client):

@@ -1,10 +1,10 @@
 # A module containing a connection to bububot's heroku postgres server
 # To use this connection, do 'from HerokuPostgresConn import conn, c'
-from __main__ import DEBUG
 
-if DEBUG:
-    # Manually grab DATABASE_URL from the shell:
-    
+
+def get_manual_conn():
+    '''Manually grab DATABASE_URL from the shell
+    Returns (connection, cursor)'''
     import psycopg2
     import subprocess
     
@@ -14,8 +14,11 @@ if DEBUG:
     conn = psycopg2.connect(db_url)
     c = conn.cursor()  # The cursors executes SQL statements
 
-else:
-    
+    return conn, c
+
+
+def get_conn():
+    '''Returns (connection, cursor)'''
     import os
     import psycopg2
     import urllib.parse as urlparse
@@ -32,3 +35,4 @@ else:
                             )
     
     c = conn.cursor()  # The cursors executes SQL statements
+    return conn, c
