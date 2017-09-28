@@ -109,13 +109,14 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     t0 = time.time()
     # Do all:
-    tasks = [loop.create_task(SVScraper.getData(i)) for i in range(10001, 10005)]
-    loop.run_until_complete(asyncio.gather(*tasks))
+    # tasks = [loop.create_task(SVScraper.getData(i)) for i in range(10001, 10005)]
+    # loop.run_until_complete(asyncio.gather(*tasks))
     # Manually one at a time:
     # loop.run_until_complete(SVScraper.getData(10001))
     # loop.run_until_complete(SVScraper.getData(10002))
     # loop.run_until_complete(SVScraper.getData(10003))
     # loop.run_until_complete(SVScraper.getData(10004))
     # loop.run_until_complete(SVScraper.getData(10005))
+    loop.run_until_complete(SVScraper.getData(10006))
     t1 = time.time()
     print('Took {:1f} seconds'.format(t1 - t0))

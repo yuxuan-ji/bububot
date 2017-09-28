@@ -15,7 +15,8 @@ class Shadowverse:
                         'darkness': 'SV10002',
                         'bahamut': 'SV10003',
                         'tempest': 'SV10004',
-                        'wonderland': 'SV10005'
+                        'wonderland': 'SV10005',
+                        'starforged': 'SV10006'
                         }
 
     @commands.group(pass_context=True, invoke_without_command=True, no_pm=True)
