@@ -117,6 +117,6 @@ if __name__ == '__main__':
     # loop.run_until_complete(SVScraper.getData(10003))
     # loop.run_until_complete(SVScraper.getData(10004))
     # loop.run_until_complete(SVScraper.getData(10005))
-    loop.run_until_complete(SVScraper.getData(10006))
+    # loop.run_until_complete(SVScraper.getData(10006))
     t1 = time.time()
     print('Took {:1f} seconds'.format(t1 - t0))

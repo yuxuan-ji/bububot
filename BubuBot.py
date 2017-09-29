@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 import logging
+import youtube_dl
 
 # Extensions to load into BubuBot:
 extensions = (
@@ -61,6 +62,8 @@ class BubuBot(commands.Bot):
                 await self.send_message(channel, content="Not a command")
             elif isinstance(err, commands.BadArgument):
                 await self.send_message(channel, content="Invalid arguments")
+            elif isinstance(err, youtube_dl.utils.DownloadError):
+                await self.send_message(channel, content=str(err))
             else:
                 self.logger.error("Unexpected error" + str(err))
                 await self.send_message(channel, content="Something bad happened")

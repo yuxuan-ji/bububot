@@ -99,7 +99,7 @@ class Voice:
             self.client.logger.debug("Playing **{}** by **{}** :  [{}]  [{} views]".format(title, uploader, duration, views))
         
         except Exception as err:
-            await self.client.say('Could not create a player')
+            await self.client.say('Could not play the song')
             self._cleanup()
             self.client.logger.exception("Could not create a player")
 
