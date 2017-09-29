@@ -94,6 +94,7 @@ class Voice:
             uploader = self.player.uploader
             duration = str(timedelta(seconds=int(self.player.duration)))
             views = self.player.views
+
             # **word** is bold in discord:
             await self.client.say("Playing **{}** by **{}** :  [{}]  [{} views]".format(title, uploader, duration, views))
             self.client.logger.debug("Playing **{}** by **{}** :  [{}]  [{} views]".format(title, uploader, duration, views))
