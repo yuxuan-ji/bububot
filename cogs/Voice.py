@@ -29,13 +29,16 @@ class Voice:
             stop_time = None
             while self == self.client.get_cog('Voice'):
                 
-                if (self.vc_client is not None) and (self.player is not None):
+                if (self.vc_client is not None):
                     # Whenever a song is playing, overwrite stop_time:
-                    if self.player.is_playing():
+                    if self.player is not None and self.player.is_playing():
                         stop_time = None
-                    
+                    # self.player is None if the song is copyrighted/DNE (No exception is raised)
+                    if self.player is None and not stop_time:
+                        self.client.logger.debug("No song was played")
+                        stop_time = time.time()
                     # When a song has stopped playing, register stop_time and disconnect after an amount of time:
-                    if self.player.is_done():
+                    if self.player is None or self.player.is_done():
                         # Traceback (most recent call last):
                         # File "C:\Users\<>\Anaconda3\lib\site-packages\discord\voice_client.py", line 276, in poll_voice_ws
                         #   yield from self.ws.poll_event()
@@ -51,8 +54,8 @@ class Voice:
                                 self._cleanup()
                                 stop_time = None
                             continue  # skip the below if stop_time is registered, we don't want to overwrite it
-                        
-                        self.client.logger.debug("{} has finished playing".format(self.player.title))
+                        if self.player is not None:
+                            self.client.logger.debug("{} has finished playing".format(self.player.title))
                         stop_time = time.time()
                         self.client.logger.debug("Created new stop time {} for {}".format(stop_time, self.vc_client.server))
                 
