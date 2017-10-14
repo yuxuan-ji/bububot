@@ -24,13 +24,13 @@ class BubuBot(commands.Bot):
         self.DEBUG_MODE = kwargs.pop('DEBUG_MODE', False)
         self.DATABASE_URL = kwargs.pop('DATABASE_URL', None)
         self.NO_HEROKU = kwargs.pop('NO_HEROKU', False)
-        self.extensions = kwargs.pop('extensions', BASE_EXTENSIONS)
+        extensions = kwargs.pop('extensions', BASE_EXTENSIONS)
         self.logger = self.set_logger(self.DEBUG_MODE)
 
         super().__init__(*args, **kwargs)
         
         # Loading the cogs:
-        for extension in self.extensions:
+        for extension in extensions:
             try:
                 self.load_extension(extension)
             except Exception as err:
