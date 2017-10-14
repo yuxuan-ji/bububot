@@ -4,7 +4,7 @@ from datetime import datetime
 import logging
 
 # Extensions to load into BubuBot:
-extensions = (
+BASE_EXTENSIONS = (
     'cogs.BaseCommands',
     'cogs.Clear',
     'cogs.Shadowverse',
@@ -16,18 +16,21 @@ extensions = (
 
 class BubuBot(commands.Bot):
 
-    def __init__(self, *args, **kwargs,):
+    def __init__(self, *args, **kwargs):
         '''Initializes a BubuBot object'''
         # Bot parameters:
         self.login_time = None  # To be updated on ready
         self.owner_id = None
         self.DEBUG_MODE = kwargs.pop('DEBUG_MODE', False)
+        self.DATABASE_URL = kwargs.pop('DATABASE_URL', None)
+        self.NO_HEROKU = kwargs.pop('NO_HEROKU', False)
+        self.extensions = kwargs.pop('extensions', BASE_EXTENSIONS)
         self.logger = self.set_logger(self.DEBUG_MODE)
 
         super().__init__(*args, **kwargs)
         
         # Loading the cogs:
-        for extension in extensions:
+        for extension in self.extensions:
             try:
                 self.load_extension(extension)
             except Exception as err:

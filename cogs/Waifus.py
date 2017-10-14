@@ -9,12 +9,18 @@ class Waifus:
     def __init__(self, client):
         '''Client = the bot'''
         self.client = client
+        self.logger = self.client.logger
         # SQL table config:
         # NOTE: execute DROP TABLE locally to change columns config, will lose all data though.
         if self.client.DEBUG_MODE:
-            from .utils.HerokuPostgresConn import get_manual_conn
-            self.conn, self.c = get_manual_conn()
-            self.client.logger.debug("Using manual connection")
+            if self.client.NO_HEROKU:
+                from .utils.HerokuPostgresConn import get_conn_manual
+                self.conn, self.c = get_conn_manual(self.client.DATABASE_URL)
+                self.client.logger.debug("Using manual connection")
+            else:
+                from .utils.HerokuPostgresConn import get_conn_shell
+                self.conn, self.c = get_conn_shell()
+                self.client.logger.debug("Using shell connection")
         else:
             from .utils.HerokuPostgresConn import get_conn
             self.conn, self.c = get_conn()
