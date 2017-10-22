@@ -3,25 +3,30 @@ from bs4 import BeautifulSoup as BS
 import json
 import asyncio
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 
 class SVScraper:
 
     @staticmethod
-    async def _getCardInfo(session: aiohttp.ClientSession, url):
-            '''Coroutine. Returns tuple(list(cardNames), list(cardProbabilities))'''
+    async def _getCardsInfo(session: aiohttp.ClientSession, url):
+            '''Coroutine. Returns tuple(gen(cardNames), gen(cardProbabilities))'''
             async with session.get(url) as response:
                 pageBS = BS(await response.text(), 'html.parser')
                 containers = [container.text for container in pageBS.findAll('td')]  # The Card Info is contained in the text of a td tag
                 # Names are contained in the even-numbered indexes td tags
                 # Probabilities are in the odd-numbered indexes td tags
-                cardNames = containers[::2]
-                cardProbabilities = containers[1::2]
+                # We don't want to use containers[::2] and containers[1::2]
+                # list slicing here because they create shallow copies
+                containers_length = len(containers)
+                cardNames = (containers[i] for i in range(0, containers_length, 2))
+                cardProbabilities = (containers[i] for i in range(1, containers_length, 2))
                 return cardNames, cardProbabilities
 
     @staticmethod
     def _filter(cardNames, cardProbabilities):
-        '''Returns a tuple ([names,...], [[%1, %2],...])'''
+        '''Returns a tuple of(dict_keys([names,...]), dict_values([[%1, %2],...]))
+        that are iterable'''
         # NOTE: The website has duplicate of certain card names because
         # the 8th card drawn in the pack contains no Bronze cards.
         # To accomodate this, we'll create a dict {name:[%]} where:
@@ -49,7 +54,7 @@ class SVScraper:
             
             filtered[name] = value
         
-        return list(filtered.keys()), list(filtered.values())
+        return filtered.keys(), filtered.values()
 
     @staticmethod
     def _getCardUrl(cardName):
@@ -73,16 +78,23 @@ class SVScraper:
             except:
                 return 'Unavailable image url'
 
+    @staticmethod
+    def _writeJsonFile(CardList, packID):
+        '''Writes the card list to a file packID.txt in json format'''
+        jsonCardsList = json.dumps(CardList)
+        with open('./data/SV' + str(packID) + '.txt', 'w') as f:
+            f.write(jsonCardsList)
+
     @classmethod
     async def getData(cls, packID):
         '''Gets the data from the ID and writes it to a file as a list of json
         objects'''
-        with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession() as session:  # 'async with' is needed because closing the session is an asynchronous operation
 
             url = "https://shadowverse.com/drawrates/?pack_id=" + str(packID)
 
             # Create two lists containing names and probabilities respectively
-            cardNames, cardProbabilities = await cls._getCardInfo(session=session, url=url)
+            cardNames, cardProbabilities = await cls._getCardsInfo(session=session, url=url)
             
             # The website has duplicate of certain card names because the 8th card drawn in the pack contains no Bronze cards
             filteredNames, filteredProbabilities = cls._filter(cardNames, cardProbabilities)
@@ -96,22 +108,25 @@ class SVScraper:
             # Create a list of json objects and write it to a file:
             CardList = []
             for data in zip(filteredNames, filteredProbabilities, cardUrls, imgUrls):
-                jsonCardInfo = {"name": data[0], "%": data[1], "url": data[2], "img": data[3]}
+                jsonCardInfo = {"name": data[0],
+                                "%": data[1],
+                                "url": data[2],
+                                "img": data[3]
+                                }
                 CardList.append(jsonCardInfo)
-    
-            jsonCardsList = json.dumps(CardList)
-    
-            with open('./data/SV' + str(packID) + '.txt', 'w') as f:
-                f.write(jsonCardsList)
-
+            
+            cls._writeJsonFile(CardList, packID)
+            
 
 if __name__ == '__main__':
     # Gathering the data:
     loop = asyncio.get_event_loop()
     t0 = time.time()
+
     # Do all:
-    # tasks = [loop.create_task(SVScraper.getData(i)) for i in range(10001, 10005)]
+    # tasks = [loop.create_task(SVScraper.getData(i)) for i in range(10001, 10007)]
     # loop.run_until_complete(asyncio.gather(*tasks))
+    
     # Manually one at a time:
     # loop.run_until_complete(SVScraper.getData(10001))
     # loop.run_until_complete(SVScraper.getData(10002))
@@ -119,5 +134,7 @@ if __name__ == '__main__':
     # loop.run_until_complete(SVScraper.getData(10004))
     # loop.run_until_complete(SVScraper.getData(10005))
     # loop.run_until_complete(SVScraper.getData(10006))
+
+    loop.close()
     t1 = time.time()
     print('Took {:1f} seconds'.format(t1 - t0))
