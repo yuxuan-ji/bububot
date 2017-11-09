@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup as BS
 import json
 import asyncio
 import time
-from concurrent.futures import ThreadPoolExecutor
 
 
 class SVScraper:

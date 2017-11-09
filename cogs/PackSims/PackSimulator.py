@@ -1,20 +1,10 @@
 import random
 import json
 import os
+from collections import namedtuple
 
 
-class Card:
-    def __init__(self, name=None, url=None, img=None, probabilities=None):
-        self.name = name
-        self.url = url
-        self.img = img
-        self.probabilities = probabilities
-
-    def __repr__(self):
-        return "Card({}, {}, {}, {})".format(self.name, self.url, self.img, self.probabilities)
-
-    def __str__(self):
-        return "{}".format(self.name)
+Card = namedtuple('Card', ['name', 'url', 'img', 'probabilities'])
 
 
 class PackSimulator:
@@ -48,11 +38,12 @@ class PackSimulator:
         amount = amount - specialDraws
 
         for jsonObj in self.parsed:
-            card = Card()
-            card.name = jsonObj['name']
-            card.url = jsonObj['url']
-            card.img = jsonObj['img']
-            card.probabilities = jsonObj['%']
+            card = Card(
+                jsonObj['name'],
+                jsonObj['url'],
+                jsonObj['img'],
+                jsonObj['%'],
+            )
             cardProbabilities.append(jsonObj['%'][0])
             if specialDraws:
                 specialProbabilities.append(jsonObj['%'][1:])  # Append all the 'special' % (lists)
