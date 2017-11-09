@@ -2,6 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 from .PackSims.PackSimulator import PackSimulator
+from .PackSims.ImageBuilder import build_image
 from .utils.Posts import postAcceptedInputs
 
 
@@ -28,54 +29,48 @@ class Shadowverse:
     @sv.command(name='open', pass_context=True)
     async def sv_open(self, ctx, choice=None, *args):
         ''' <packName> (show)
-        Prints out the results in an Embed, and optionally the images (deleted after 10 seconds)
+        Sends the cards opened to the message channel.
         '''
         if not choice:
             return await postAcceptedInputs(client=self.client, choices=self.choices.keys())
         
-        # Show parameter
-        SHOW = False
-        if "show" in args:
-            SHOW = True
+        # INFO parameter
+        INFO = False
+        for arg in args:
+            if arg.lower() == "info":
+                INFO = True
 
         try:
             packID = self.choices[choice]
             myPack = PackSimulator(packID).openPack(amount=8, specialDraws=1)  # returns a list of Card objects
             
-            imgEmbeds = []  # list containing Embed objects with the card images
+            img_urls = []
             value = ""
             
             for card in myPack:
-                # Building the first message:
-                value += card.name + ', ' + card.url + '\n'
-                # Optionally building the list of images to post:
-                if SHOW:
-                    embed = discord.Embed()
-                    embed.set_image(url=card.img)
-                    imgEmbeds.append(embed)
+                img_urls.append(card.img)
+                # Optionally building an info embed:
+                if INFO:
+                    value += card.name + ', ' + card.url + '\n'
 
-            # The first message is an Embed containing the card names and url
-            embed = discord.Embed()
-            embed.add_field(name="The Cards you've opened are:", value=value)
-            firstMsg = await self.client.say(embed=embed)  # self.client.say returns a Message object
+            # Info embed:
+            if INFO:
+                embed = discord.Embed()
+                embed.add_field(name="Command User:", value=ctx.message.author.mention)
+                embed.add_field(name="The Cards you've opened are:", value=value)
+                await self.client.say(embed=embed)
 
-            # Then, possibly post the images to the channel and delete after x seconds
-            if imgEmbeds and SHOW:
-                # Posting:
-                time = 5
-                imgMgs = []
-                for url in imgEmbeds:
-                    imgMgs.append(await self.client.say(embed=url))
-                    await asyncio.sleep(1)
+            # Then, post the images to the channel
+            if img_urls:
+                if not INFO:
+                    await self.client.say(ctx.message.author.mention)  # Only mention if the info embed wasn't sent
 
-                # Deleting:
-                # Note: Tried using client.say()'s delete_after:float parameter but it wasn't as smooth as doing it manually
-                imgMgs.append(await self.client.say('Deleting in {} seconds'.format(time)))
-                await asyncio.sleep(time)
-                await self.client.delete_messages(imgMgs)
+                result = await build_image(img_urls)
+                result.save("roll.png")
+                await self.client.send_file(ctx.message.channel, "roll.png")
+                result.close()
 
             self.client.logger.debug("Opened: " + str([(card.name, card.probabilities, card.img) for card in myPack]))
-            return firstMsg
         
         except KeyError:
             await self.client.say('Unidentified pack')

@@ -19,7 +19,7 @@ class Games:
         answer = random.choice(['Yes', 'No'])
         
         embed = discord.Embed()
-        embed.add_field(name='Asker:', value=ctx.message.author.name)
+        embed.add_field(name='Asker:', value=ctx.message.author.mention)
         embed.add_field(name='Question:', value=question)
         embed.add_field(name='Answer:', value=answer)
         
