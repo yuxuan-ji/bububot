@@ -40,7 +40,8 @@ class Shadowverse:
         pack_amount = int(pack_amount)
         if pack_amount > 10:
             return await self.client.say("You can only open a maximum of 10 packs at a time.")
-        
+        if pack_amount <= 0:
+            return await self.client.say("Invalid amount.")
         try:
             packID = self.choices[choice]
             myPack = []
