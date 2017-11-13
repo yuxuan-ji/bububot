@@ -34,9 +34,10 @@ class Shadowverse:
         '''
         if not choice:
             return await postAcceptedInputs(client=self.client, choices=self.choices.keys())
-        
         choice = choice.lower()
-
+        if not pack_amount.isdigit():
+            return await self.client.say("Amount must be a number")
+        pack_amount = int(pack_amount)
         if pack_amount > 10:
             return await self.client.say("You can only open a maximum of 10 packs at a time.")
         
