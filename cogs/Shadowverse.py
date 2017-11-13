@@ -26,6 +26,7 @@ class Shadowverse:
         subcommands = ['open']
         await postAcceptedInputs(client=self.client, choices=subcommands)
 
+    @commands.cooldown(10, 20)
     @sv.command(name='open', pass_context=True)
     async def sv_open(self, ctx, choice=None, *args):
         ''' <packName> (show)
@@ -34,15 +35,23 @@ class Shadowverse:
         if not choice:
             return await postAcceptedInputs(client=self.client, choices=self.choices.keys())
         
-        # INFO parameter
+        choice = choice.lower()
+
+        # Parameters checking:
         INFO = False
+        pack_amount = 1
         for arg in args:
             if arg.lower() == "info":
                 INFO = True
+            if arg.isdigit():
+                pack_amount = int(arg)
 
         try:
             packID = self.choices[choice]
-            myPack = PackSimulator(packID).openPack(amount=8, specialDraws=1)  # returns a list of Card objects
+            myPack = []
+            
+            for _ in range(pack_amount):
+                myPack += PackSimulator(packID).openPack(amount=8, specialDraws=1)  # returns a list of Card objects
             
             img_urls = []
             value = ""
@@ -53,22 +62,21 @@ class Shadowverse:
                 if INFO:
                     value += card.name + ', ' + card.url + '\n'
 
+            if img_urls:
+                result = await build_image(img_urls)
+                result.save("roll.png")
+                if not INFO:
+                    await self.client.send_file(ctx.message.channel, "roll.png", content=ctx.message.author.mention)
+                else:
+                    await self.client.send_file(ctx.message.channel, "roll.png")
+                result.close()
+
             # Info embed:
             if INFO:
                 embed = discord.Embed()
                 embed.add_field(name="Command User:", value=ctx.message.author.mention)
                 embed.add_field(name="The Cards you've opened are:", value=value)
                 await self.client.say(embed=embed)
-
-            # Then, post the images to the channel
-            if img_urls:
-                if not INFO:
-                    await self.client.say(ctx.message.author.mention)  # Only mention if the info embed wasn't sent
-
-                result = await build_image(img_urls)
-                result.save("roll.png")
-                await self.client.send_file(ctx.message.channel, "roll.png")
-                result.close()
 
             self.client.logger.debug("Opened: " + str([(card.name, card.probabilities, card.img) for card in myPack]))
         

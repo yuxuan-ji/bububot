@@ -62,8 +62,8 @@ class BubuBot(commands.Bot):
                 await self.send_message(channel, content="Insufficient permissions")
             elif isinstance(err, commands.CommandNotFound):
                 await self.send_message(channel, content="Not a command")
-            elif isinstance(err, commands.BadArgument):
-                await self.send_message(channel, content="Invalid arguments")
+            elif isinstance(err, commands.CommandOnCooldown):
+                await self.send_message(channel, content="{} Chillax my dude".format(ctx.message.author.mention))
             else:
                 self.logger.exception("Unexpected error: {}--{}--{}".format(err, ctx.message.content, channel))
                 await self.send_message(channel, content="Something bad happened")
