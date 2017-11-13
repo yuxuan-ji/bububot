@@ -1,5 +1,3 @@
-import asyncio
-import discord
 from discord.ext import commands
 from .PackSims.PackSimulator import PackSimulator
 from .PackSims.ImageBuilder import build_image
@@ -58,7 +56,7 @@ class Shadowverse:
 
             result = await build_image(img_urls)
             result.save("roll.png")
-            await self.client.send_file(ctx.message.channel, "roll.png")
+            await self.client.send_file(ctx.message.channel, "roll.png", content=ctx.message.author.mention)
             result.close()  # Result is a PIL image that must be closed
 
             self.client.logger.debug("Opened: " + str([(card.name, card.probabilities, card.img) for card in myPack]))
