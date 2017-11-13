@@ -28,8 +28,8 @@ class Shadowverse:
 
     @commands.cooldown(10, 20)
     @sv.command(name='open', pass_context=True)
-    async def sv_open(self, ctx, choice=None, *args):
-        ''' <packName> (pack amount) (info)
+    async def sv_open(self, ctx, choice=None, pack_amount=1):
+        ''' <packName> (pack amount)
         Sends the cards opened to the message channel.
         '''
         if not choice:
@@ -37,14 +37,6 @@ class Shadowverse:
         
         choice = choice.lower()
 
-        # Parameters checking:
-        INFO = False
-        pack_amount = 1
-        for arg in args:
-            if arg.lower() == "info":
-                INFO = True
-            if arg.isdigit():
-                pack_amount = int(arg)
         if pack_amount > 10:
             return await self.client.say("You can only open a maximum of 10 packs at a time.")
         
@@ -56,29 +48,14 @@ class Shadowverse:
                 myPack += PackSimulator(packID).openPack(amount=8, specialDraws=1)  # returns a list of Card objects
             
             img_urls = []
-            value = ""
             
             for card in myPack:
                 img_urls.append(card.img)
-                # Optionally building an info embed:
-                if INFO:
-                    value += card.name + ', ' + card.url + '\n'
 
-            if img_urls:
-                result = await build_image(img_urls)
-                result.save("roll.png")
-                if not INFO:
-                    await self.client.send_file(ctx.message.channel, "roll.png", content=ctx.message.author.mention)
-                else:
-                    await self.client.send_file(ctx.message.channel, "roll.png")
-                result.close()
-
-            # Info embed:
-            if INFO:
-                embed = discord.Embed()
-                embed.add_field(name="Command User:", value=ctx.message.author.mention)
-                embed.add_field(name="The Cards you've opened are:", value=value)
-                await self.client.say(embed=embed)
+            result = await build_image(img_urls)
+            result.save("roll.png")
+            await self.client.send_file(ctx.message.channel, "roll.png")
+            result.close()  # Result is a PIL image that must be closed
 
             self.client.logger.debug("Opened: " + str([(card.name, card.probabilities, card.img) for card in myPack]))
         
