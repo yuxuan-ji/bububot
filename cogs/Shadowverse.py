@@ -29,7 +29,7 @@ class Shadowverse:
     @commands.cooldown(10, 20)
     @sv.command(name='open', pass_context=True)
     async def sv_open(self, ctx, choice=None, *args):
-        ''' <packName> (show)
+        ''' <packName> (pack amount) (info)
         Sends the cards opened to the message channel.
         '''
         if not choice:
@@ -45,7 +45,9 @@ class Shadowverse:
                 INFO = True
             if arg.isdigit():
                 pack_amount = int(arg)
-
+        if pack_amount > 10:
+            return await self.client.say("You can only open a maximum of 10 packs at a time.")
+        
         try:
             packID = self.choices[choice]
             myPack = []
