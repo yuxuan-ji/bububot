@@ -28,7 +28,7 @@ class Shadowverse:
 
     @commands.cooldown(10, 20)
     @sv.command(name='open', pass_context=True)
-    async def sv_open(self, ctx, choice=None, pack_amount=1):
+    async def sv_open(self, ctx, choice=None, pack_amount='1'):
         ''' <packName> (pack amount)
         Sends the cards opened to the message channel.
         '''
@@ -36,7 +36,7 @@ class Shadowverse:
             return await postAcceptedInputs(client=self.client, choices=self.choices.keys())
         choice = choice.lower()
         if not pack_amount.isdigit():
-            return await self.client.say("Amount must be a number")
+            return await self.client.say("Amount must be a number.")
         pack_amount = int(pack_amount)
         if pack_amount > 10:
             return await self.client.say("You can only open a maximum of 10 packs at a time.")
