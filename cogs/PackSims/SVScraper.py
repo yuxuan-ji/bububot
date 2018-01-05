@@ -123,16 +123,17 @@ if __name__ == '__main__':
     t0 = time.time()
 
     # Do all:
-    # tasks = [loop.create_task(SVScraper.getData(i)) for i in range(10001, 10007)]
+    # tasks = [loop.create_task(SVScraper.getData(i)) for i in range(10001, 10008)]
     # loop.run_until_complete(asyncio.gather(*tasks))
     
     # Manually one at a time:
-    # loop.run_until_complete(SVScraper.getData(10001))
-    # loop.run_until_complete(SVScraper.getData(10002))
-    # loop.run_until_complete(SVScraper.getData(10003))
-    # loop.run_until_complete(SVScraper.getData(10004))
-    # loop.run_until_complete(SVScraper.getData(10005))
-    # loop.run_until_complete(SVScraper.getData(10006))
+    # loop.run_until_complete(SVScraper.getData(10001)) #std
+    # loop.run_until_complete(SVScraper.getData(10002)) #dark
+    # loop.run_until_complete(SVScraper.getData(10003)) #baha
+    # loop.run_until_complete(SVScraper.getData(10004)) #temp
+    # loop.run_until_complete(SVScraper.getData(10005)) #wond
+    # loop.run_until_complete(SVScraper.getData(10006)) #star
+    loop.run_until_complete(SVScraper.getData(10007)) #chrono
 
     loop.close()
     t1 = time.time()
