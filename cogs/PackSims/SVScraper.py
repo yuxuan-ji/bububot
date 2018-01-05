@@ -71,7 +71,7 @@ class SVScraper:
         async with session.get(url) as response:
             try:
                 pageBS = BS(await response.text(), 'html.parser')
-                containers = pageBS.findAll('section', {'id': 'content'})
+                containers = pageBS.findAll('div', {'class': 'unevolved-section-image'})
                 imgRelPath = str(containers[0].img['src'])
                 return "https://shadowverse.gamepress.gg" + imgRelPath
             except:
