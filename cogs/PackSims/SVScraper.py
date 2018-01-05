@@ -60,7 +60,7 @@ class SVScraper:
         '''Returns the corresponding gamepress url of a card'''
         url = 'https://shadowverse.gamepress.gg/card/'
         nameFixed = cardName.lower().replace(',', "").replace("'", "").replace(".", " ").split()
-        nameFixed = list(filter(lambda x: x not in ['at', 'with', 'in', 'of', 'the', 'to', 'into'], nameFixed))
+        nameFixed = list(filter(lambda x: x not in ['at', 'with', 'in', 'of', 'the', 'to', 'into', 'from'], nameFixed))
         nameFixed = "-".join(nameFixed)
         url = url + nameFixed
         return url
@@ -72,10 +72,14 @@ class SVScraper:
             try:
                 pageBS = BS(await response.text(), 'html.parser')
                 containers = pageBS.findAll('div', {'class': 'unevolved-section-image'})
+                if not containers:
+                    containers = pageBS.findAll('div', {'class': 'non-follower-image'})
                 imgRelPath = str(containers[0].img['src'])
                 return "https://shadowverse.gamepress.gg" + imgRelPath
             except:
-                return 'Unavailable image url'
+                # Animated Daria art for unavailable images
+                print('[Not found] : ' + url)
+                return 'https://shadowverse.gamepress.gg/sites/shadowverse/files/styles/medium/public/2016-12/Daria%2C%20Dimensional%20Witch%20Evolved_0.png?itok=q0s7W05W'
 
     @staticmethod
     def _writeJsonFile(CardList, packID):
