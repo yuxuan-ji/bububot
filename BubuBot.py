@@ -8,7 +8,7 @@ BASE_EXTENSIONS = (
     'cogs.BaseCommands',
     'cogs.Clear',
     'cogs.Shadowverse',
-    'cogs.Waifus',
+    'cogs.Images',
     'cogs.Move',
     'cogs.Voice',
     'cogs.Games')

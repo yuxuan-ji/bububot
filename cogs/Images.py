@@ -3,8 +3,8 @@ from .utils.Posts import postAcceptedInputs, postEmbedImg
 from .utils.Checks import is_admin
 
 
-class Waifus:
-    '''Commands to summon waifus'''
+class Images:
+    '''Commands to summon imgs'''
 
     def __init__(self, client):
         '''Client = the bot'''
@@ -29,9 +29,9 @@ class Waifus:
 
     @commands.command(pass_context=True)
     @commands.check(is_admin)
-    async def addwaifu(self, ctx, name, emote, url):
+    async def addimg(self, ctx, name, emote, url):
         '''<name> <emote> <url> *Admin
-        Adds the waifu to the database'''
+        Adds the img to the database'''
         try:
             with self.conn:
                 # Check if the entry already exists:
@@ -51,9 +51,9 @@ class Waifus:
 
     @commands.command(pass_context=True)
     @commands.check(is_admin)
-    async def delwaifu(self, ctx, name, emote):
+    async def delimg(self, ctx, name, emote):
         '''<name> <emote> *Admin
-        Deletes the waifu from the database
+        Deletes the img from the database
         '''
         try:
             with self.conn:
@@ -66,10 +66,10 @@ class Waifus:
             self.client.logger.exception("Could delete from the database")
 
     @commands.command(pass_context=True)
-    async def waifu(self, ctx, *args):
-        '''<name> <emote> : Summons the waifu'''
+    async def img(self, ctx, *args):
+        '''<name> <emote> : Summons the img'''
         if len(args) < 2:
-            # Show all available waifus and emotes:
+            # Show all available img and emotes:
             with self.conn:
                 try:
                     self.c.execute('SELECT * FROM waifus')
@@ -97,4 +97,4 @@ class Waifus:
 
 
 def setup(client):
-    client.add_cog(Waifus(client))
+    client.add_cog(Images(client))
