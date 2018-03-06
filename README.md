@@ -1,12 +1,4 @@
-#OUTDATED README
-
-Discord bot made by Chabbies
-
-
-For a list of commands, use the '!b help' command
-
-
-How to use:
+# Installation:
 
     1) Create an app on: https://discordapp.com/developers/applications/me
     
@@ -26,13 +18,30 @@ How to use:
 
     9) Activate the app on the app page.
 
+    10) For a list of commands, use the '!b help' command.
 
-VERSIONS:
-    
-    1.0: Basic bot with only test features.
+# Some Features:
+## Shadowverse Pack Simulator
 
-    2.0: Added rem, megumin, clear and openpack commands. This version can be found in BubuBotUgly.
+```
+!b sv open [choice] [pack_amount=1]
 
-    3.0: Major overhaul: Cogs introduced for better organization, upgraded openpack to use aiohttp instead of requests, better documentation, old git repo deleted for a new one since commit history got messed up.
-    
-    4.0: Now hosted on Heroku. Upgraded Waifus to use a Postgresql server on heroku.
+<packName> (pack amount)
+Sends the cards opened to the message channel.
+```
+
+### Example Uses:
+
+**Command Usage:**
+
+![roll ex](images/rollexample.png)
+
+The **output files** can then viewed by themselves:
+
+**Rolling once**:
+
+![roll 1](images/roll1.png)
+
+**Rolling twice** (up to 10 rolls at once):
+
+![roll 2](images/roll2.png)
