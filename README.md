@@ -20,6 +20,36 @@
 
     10) For a list of commands, use the '!b help' command.
 
+# Commands:
+```
+BaseCommands:
+  changeplaying <gamename> *Admin
+  test          Test command
+  uptime        Prints out how long the bot has been online
+Clear:
+  clear         <number> *Admin
+Games:
+  answerme      <question> : 100% accuracy
+Move:
+  move          <userID> <channelID> *Admin
+  moveme        <channelID> *Admin
+Shadowverse:
+  sv            Shadowverse extension manager
+Voice:
+  play          <url|keywords>
+  skip          Skip song
+  stop          Stop song, clear queue, disconnect Bot
+Emotes:
+  addemote        <name> <emote> <url> *Admin
+  delemote        <name> <emote> *Admin
+  emote           <name> <emote> : Summons the emote
+​No Category:
+  help          Shows this message.
+
+Type !b help command for more info on a command.
+You can also type !b help category for more info on a category.
+```
+
 # Some Features:
 ## Shadowverse Pack Simulator
 
