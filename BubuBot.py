@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
+from cogs.utils.tf.SakuModel import SakuModel
 import logging
 
 # Extensions to load into BubuBot:
@@ -21,6 +22,7 @@ class BubuBot(commands.Bot):
         # Bot parameters:
         self.login_time = None  # To be updated on ready
         self.owner_id = None
+        self.SakuModel = None
         self.DEBUG_MODE = kwargs.pop('DEBUG_MODE', False)
         self.DATABASE_URL = kwargs.pop('DATABASE_URL', None)
         self.NO_HEROKU = kwargs.pop('NO_HEROKU', False)
@@ -47,7 +49,7 @@ class BubuBot(commands.Bot):
             self.owner_id = app_info.owner.id
             self.login_time = datetime.now()
             await self.change_presence(game=discord.Game(name='waga na wa bubu'))
-
+            self.SakuModel = SakuModel('cogs/utils/tf/retrained_labels.txt', 'cogs/utils/tf/retrained_graph.pb')
             # Login log messages:
             print('Logged in as')
             print(self.user.name)

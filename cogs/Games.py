@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import random
+import aiohttp
 
 
 class Games:
@@ -26,6 +27,19 @@ class Games:
         # Post the embed and delete the original command:
         await self.client.say(embed=embed)
         await self.client.delete_message(ctx.message)
+
+    @commands.cooldown(1, 30)
+    @commands.command(pass_context=True)
+    async def predict(self, ctx, url):
+        '''<jpg url> : This better be a jpg or I will slap you'''
+        try:
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(url) as resp:
+                    image_data = await resp.read()
+                    return await self.client.say(self.client.SakuModel.predict(image_data))
+
+        except Exception as e:
+            return await self.client.say('bruh...')
 
 
 def setup(client):
