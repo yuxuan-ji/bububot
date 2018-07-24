@@ -28,7 +28,7 @@ class Games:
         await self.client.say(embed=embed)
         await self.client.delete_message(ctx.message)
 
-    @commands.cooldown(1, 30)
+    @commands.cooldown(1, 15)
     @commands.command(pass_context=True)
     async def predict(self, ctx, url):
         '''<jpg url> : This better be a jpg or I will slap you'''
